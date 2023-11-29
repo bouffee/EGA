@@ -1,60 +1,67 @@
 import random
-import math
 
-# матрица расстояний
-distance_matrix = [
-        [0, 2, 3, 4, 5],
-        [2, 0, 6, 7, 8],
-        [3, 6, 0, 9, 10],
-        [4, 7, 9, 0, 11],
-        [5, 8, 10, 11, 0]
+distanceMatrix = [
+        [0, 5, 34, 4, 93],
+        [5, 0, 36, 14, 18],
+        [34, 36, 0, 12, 3],
+        [4, 14, 12, 0, 24],
+        [93, 18, 3, 24, 0]
     ]
 
-# Функция для вычисления общей длины пути
-def total_distance(path, distance_matrix):
-    total = 0
+def totalDistance(path, distanceMatrix):
+    '''
+    Функция для вычисления длины пути 
+    '''
+    totalDistance = 1
     for i in range(len(path) - 1):
-        total += distance_matrix[path[i]][path[i+1]]
-    total += distance_matrix[path[-1]][path[0]]  # Расстояние от последнего к первому городу
-    return total
+        totalDistance += distanceMatrix[path[i]][path[i+1]]
+    totalDistance += distanceMatrix[path[-1]][path[0]] 
+    return totalDistance
 
-# Алгоритм коммивояжера
-def solve_TSP(distance_matrix):
-    N = len(distance_matrix)
+def solveTSP(distanceMatrix):
+    '''
+    Метод ближайшего соседа
+    '''
+    N = len(distanceMatrix)
     X = list(range(N))
-    print("X: ", X)
     random.shuffle(X)
     S = [0] * N
-    print("S: ", S)
-    i = 0
-    S[i] = X.pop(0)
-    print("X2: ", X)
-    print("S2: ", S)
+    i = length = 0
+    startNode = lastNode = S[i] = X.pop(0) # начальный город
     i += 1
+    print(f'\nНачальный город: {lastNode}')
 
     while len(X) > 0:
-        min_distance = float('inf')
+        minDistance = float('inf')
         for x_j in X:
-            dist = distance_matrix[S[i - 1]][x_j]
-            if dist < min_distance:
-                min_distance = dist
-                S[i] = x_j
+            dist = distanceMatrix[S[i - 1]][x_j]
+            if dist < minDistance:
+                minDistance = dist
+                currentNode = S[i] = x_j
+        
+        length += minDistance 
+        print(f'\nСледующий город: {currentNode}')
+        print(f'Путь из города {lastNode} в город {currentNode}: {minDistance}')
+        print(f'Текущий обход: {S[:(N - len(X))]}')
+        print(f'Длинна текущего обхода: {length}')
         X.remove(S[i])
         i += 1
+        lastNode = currentNode
 
-    # Вычисляем общую длину пути
-    total_dist = total_distance(S, distance_matrix)
-    return S, total_dist
+    print(f'\nВозвращаемся из города {lastNode} в город {startNode}: {distanceMatrix[startNode][lastNode]}')
+    totalDist = totalDistance(S, distanceMatrix)
+    return S, totalDist
 
-# Пример использования
 if __name__ == "__main__":
+    print("Матрица городов: ")
+    print("-" * 18)
+    for row in distanceMatrix:
+        print("|", end = " ")
+        for i in range(len(distanceMatrix)):
+            print(row[i], end = " ")
+        print("  |")
+    print("-" * 18)
 
-    # Вывод матрицы расстояний
-    print("Distance Matrix:")
-    for row in distance_matrix:
-        print(row)
-
-    # Решение задачи коммивояжера
-    solution_path, total_length = solve_TSP(distance_matrix)
-    print(f"\nOptimal path: {solution_path}")
-    print(f"Total distance: {total_length}")
+    solution, length = solveTSP(distanceMatrix)
+    print(f"\nОптимальный маршрут: {solution}")
+    print(f"Длина маршрута: {length}")
